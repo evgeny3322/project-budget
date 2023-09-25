@@ -1,32 +1,36 @@
-import { JoinColumn, Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn, UpdateDateColumn } from "typeorm";
-import { User } from "../../user/entities/user.entity";
-import { Category } from "../../category/entities/category.entity";
+import { Category } from 'src/category/entities/category.entity';
+//! Таблица для БД, сущности Transaction (доход/расход) - создалась таблица в БД
+import { User } from "src/user/entities/user.entity";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Transaction {
-  @PrimaryColumn({name: 'transaction_id'})
-  id: number
 
-  @Column()
-  title: string
+    @PrimaryGeneratedColumn({ name: 'transaction_id' })
+    id: number;
 
-  @Column({nullable: true})
-  type: string
+    @Column()
+    title: string;
 
-  @ManyToOne(() => User, (user) => user.transactions)
-  @JoinColumn({name: 'user_id',},)
-  user: User
+    @Column({ nullable: true }) // позволенное значение, т.е. может быть null 
+    type: string; // тип: доход или расход
 
-  @ManyToOne(() => Category, (category) => category.transactions)
-  @JoinColumn({name: 'category_id'})
-  category: Category
+    // связь: привязать к текущему пользователю
+    @ManyToOne(() => User, (user) => user.transactions)
+    @JoinColumn({ name: 'user_id' }) // объединить  в колонку "user_id"
+    user: User;
 
-  @Column()
-  amount: number
+    // связь: привязать к текущей категории
+    @ManyToOne(() => Category, (category) => category.transactions)
+    @JoinColumn({ name: 'category_id' })
+    category: Category;
 
-  @CreateDateColumn()
-  createdAt: Date
+    @Column()
+    amount: number;
 
-  @UpdateDateColumn()
-  updatedAt: Date
+    @CreateDateColumn() 
+    createdAt: Date;
+
+    @UpdateDateColumn() 
+    updatedAt: Date;
 }

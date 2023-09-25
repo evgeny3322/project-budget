@@ -1,9 +1,5 @@
+// тип для server\src\auth\auth.service.ts
 export interface IUser {
-  id: string
-  email: string
-}
-
-export enum TransactionType {
-  EXPENSE = 'expense',
-  INCOME = 'income',
+    id: string
+    email: string
 }

@@ -1,13 +1,15 @@
-import { IsInstance, IsNotEmpty, IsObject, IsOptional } from "class-validator";
-import { User } from "../../user/entities/user.entity";
+// ожидаемый тип данных для Categories - какие поля (столбцы) ожидаются при вводе новой категории User-ом
+
+// пакет для валидации (входящих данных в БД)
+import { IsNotEmpty, IsOptional } from "class-validator";
+import { User } from "src/user/entities/user.entity";
+
 
 export class CreateCategoryDto {
-  @IsNotEmpty()
-  title: string
+    @IsNotEmpty() // поле обязательное для заполнения (не пустое)
+    title: string
 
-  @IsOptional()
-  user?: User;
+    @IsOptional() // не обязательное поле
+    user?: User // типа User
 
-  // @IsNotEmpty()
-  // user: User
 }

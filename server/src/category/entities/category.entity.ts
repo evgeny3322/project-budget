@@ -1,34 +1,29 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from "typeorm";
-import { User } from "../../user/entities/user.entity";
-import { Transaction } from "../../transaction/entities/transaction.entity";
+import { Transaction } from './../../transaction/entities/transaction.entity';
+import { User } from './../../user/entities/user.entity';
+// Таблица (схема) в БД сущности Category 
+import { Column, CreateDateColumn, UpdateDateColumn, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from "typeorm";
 
 @Entity()
 export class Category {
-  @PrimaryGeneratedColumn({name: 'category_id'})
-  id: number
+    @PrimaryGeneratedColumn({ name: 'category_id' }) // теперь 'category_id' - будет названа колонка только в БД
+    id: number;
 
-  @Column()
-  title: string
+    @Column()
+    title: string;
 
-  @ManyToOne(() => User, (user) => user.categories)
-  @JoinColumn({name: 'user_id'})
-  user: User
+    // связь
+    @ManyToOne(() => User, (user) => user.categories)
+    // объеденить в колонку "user_id"
+    @JoinColumn({ name: 'user_id' }) // без этой строчки, колонка называлась бы просто "userid"
+    user: User;
 
-  @OneToMany(()=> Transaction,(transaction)=>transaction.category)
-  transactions: Transaction[]
+    // связь 
+    @OneToMany(() => Transaction, (transaction) => transaction.category)
+    transactions: Transaction[]
 
-  @CreateDateColumn()
-  createdAt: Date
+    @CreateDateColumn() // дата - когда был создан
+    createdAt: Date;
 
-  @UpdateDateColumn()
-  updatedAt: Date
+    @UpdateDateColumn() //когда был обновлен
+    updatedAt: Date;
 }
