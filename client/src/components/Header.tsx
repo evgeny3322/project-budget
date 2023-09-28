@@ -7,7 +7,7 @@ interface ActiveLinkProps {
 };
 
 const Header: FC = () => {
-  const isAuth: boolean = true
+  const isAuth: boolean = false
 
   const activeLink = ({isActive}: ActiveLinkProps): string =>
     isActive ? 'text-white' : 'text-white/50';
