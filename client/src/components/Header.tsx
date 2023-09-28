@@ -1,13 +1,27 @@
 import { FC } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { FaBtc, FaSignOutAlt } from 'react-icons/fa';
+import { useAuth } from "../hooks/useAuth.ts";
+import { useDispatch } from "react-redux";
+import { logout } from "../store/user/userSlice.ts";
+import { removeTokenFromLocalStorage } from "../helpers/localstorage.helper.ts";
+import { toast } from "react-toastify";
 
 interface ActiveLinkProps {
   isActive: boolean;
 };
 
 const Header: FC = () => {
-  const isAuth: boolean = false
+  const isAuth = useAuth()
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  const logOut = () => {
+    dispatch(logout())
+    removeTokenFromLocalStorage('token')
+    toast.success('You logged out')
+    navigate('/')
+  }
 
   const activeLink = ({isActive}: ActiveLinkProps): string =>
     isActive ? 'text-white' : 'text-white/50';
@@ -39,7 +53,7 @@ const Header: FC = () => {
       {/*Actions*/}
       {
         isAuth ? (
-          <button className='btn btn-red'>
+          <button className='btn btn-red' onClick={logOut}>
             <span>Log Out</span>
             <FaSignOutAlt/>
           </button>
