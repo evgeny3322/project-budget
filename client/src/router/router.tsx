@@ -1,40 +1,47 @@
-import { createBrowserRouter } from "react-router-dom";
-import Layout from "../pages/Layout.tsx";
-import ErrorPage from "../pages/ErrorPage.tsx";
-import Home from "../pages/Home.tsx";
+import { createBrowserRouter } from "react-router-dom"; // создает RouterApp
+import ProtectedRoute from "../components/ProtectedRoute"; // защищенная страница или 'transactions'/'categories'
+import Auth from "../pages/Auth";
+import Categories, { categoriesAction, categoryLoader } from "../pages/Categories";
+import ErrorPage from "../pages/ErrorPage";
+import Home from "../pages/Home";
+import Layout from "../pages/Layout";
 import Transactions from "../pages/Transactions.tsx";
-import Categories from "../pages/Categories.tsx";
-import Auth from "../pages/Auth.tsx";
-import ProtectedRoute from "../components/ProtectedRoute.tsx";
 
 export const router = createBrowserRouter([
   {
-    path: '/',
-    element: <Layout/>,
-    errorElement: <ErrorPage/>,
+    path: "/",
+    element: <Layout />, // основной шаблон
+    errorElement: <ErrorPage />, // шаблон ошибки
+    // дочерние страницы
     children: [
       {
-        index: true,
-        element: <Home/>
+        index: true, // одно и тоже, что: path: '/'
+        element: <Home />,
       },
       {
-        path: 'transactions',
-        element: (<ProtectedRoute>
-            <Transactions/>
+        path: "transactions",
+        element: (
+          <ProtectedRoute>
+            <Transactions />
           </ProtectedRoute>
         ),
       },
       {
-        path: 'categories',
-        element: (<ProtectedRoute>
-          <Categories/>
-        </ProtectedRoute>)
+        path: "categories",
+        action: categoriesAction, // из react-router-dom, подробнее: https://reactrouter.com/en/main/components/form#mutation-submissions
+        // useLoaderData() возвращает данные (в Categories.tsx), которые возращает метод (categoryLoader), подключенный в router.tsx в поле "loader"
+        loader: categoryLoader, // https://reactrouter.com/en/main/hooks/use-loader-data#useloaderdata
+        element: (
+          <ProtectedRoute>
+            <Categories />
+          </ProtectedRoute>
+        ),
       },
       {
-        path: 'auth',
-        element: <Auth/>
+        path: "auth",
+        element: <Auth />,
       }
     ]
+
   }
 ])
-
