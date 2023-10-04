@@ -1,70 +1,73 @@
-import { FC } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { FaBtc, FaSignOutAlt } from 'react-icons/fa';
-import { useAuth } from "../hooks/useAuth.ts";
-import { useDispatch } from "react-redux";
-import { logout } from "../store/user/userSlice.ts";
-import { removeTokenFromLocalStorage } from "../helpers/localstorage.helper.ts";
-import { toast } from "react-toastify";
-
-interface ActiveLinkProps {
-  isActive: boolean;
-};
+import { FC } from 'react'; // TypeScript - интерфейс функционального компонента: FC
+import { Link, NavLink, useNavigate } from 'react-router-dom'; // Link - это обозначение ссылки
+import { FaBtc, FaSignOutAlt } from 'react-icons/fa'; // библиотека иконок
+import { useAuth } from '../hooks/useAuth';  // катомный хук получения сосотяние из Redux-Toolkit
+import { useAppDispatch } from '../store/hooks';
+import { logout } from '../store/user/userSlice';
+import { removeTokenFromLocalStorage } from '../helpers/localstorage.helper';
+import { toast } from 'react-toastify'; // всплывающие сообщения
 
 const Header: FC = () => {
-  const isAuth = useAuth()
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+    // залогинен ли пользователь
+    const isAuth = useAuth(); // хук состояния
 
-  const logOut = () => {
-    dispatch(logout())
-    removeTokenFromLocalStorage('token')
-    toast.success('You logged out')
-    navigate('/')
-  }
+    // обработчик для выхода из системы
+    const dispatch = useAppDispatch()
+    const navigate = useNavigate() // переадресация на определенную страницу
+    
+    const logoutHandler = () => {
+        dispatch(logout()) // изменить состояние:{
+        //     state.isAuth = false 
+        //     state.user = null
+        // }
+        removeTokenFromLocalStorage('token') // удалить токен, раз user вышел
+        toast.success('You logged out.') // всплывающее сообщение
+        navigate('/') // переадресация на главную страницу
+    }
 
-  const activeLink = ({isActive}: ActiveLinkProps): string =>
-    isActive ? 'text-white' : 'text-white/50';
+    return (
+        <header className='flex items-center p-4 shadow-sm bg-slate-800 backdrop-blur-sm'>
+            <Link to="/">
+                <FaBtc size={20} />
+            </Link>
 
-  return (
-    <header className="flex items-center  p-4 shadow-sm bg-slate-800 backdrop-blur-sm">
-      <Link>
-        <FaBtc size={20}/>
-      </Link>
-      {/*Menu*/}
-      {
-        isAuth && (
-          <nav className='ml-auto mr-10'>
-            <ul className="flex items-center gap-5 ">
-              <li>
-                <NavLink to={'/'} className={activeLink}>Home</NavLink>
-              </li>
-              <li>
-                <NavLink to={'/transactions'} className={activeLink}>Transactions</NavLink>
-              </li>
-              <li>
-                <NavLink to={'/categories'} className={activeLink}>Categories</NavLink>
-              </li>
+            {
+                //! menu
+                // условие: если user авторизирован, то отрендерить список (menu)
+                isAuth && (
+                    <nav className='ml-auto mr-10'>
+                        <ul className="flex items-center gap-5">
+                            <li>
+                                <NavLink to={'/'} className={({ isActive }) => isActive ? 'text-white' : 'text-white/50'}> Home</NavLink>
+                            </li>
+                            <li>
+                                <NavLink to={'/transactions'} className={({ isActive }) => isActive ? 'text-white' : 'text-white/50'}> Transactions </NavLink>
+                            </li>
+                            <li>
+                                <NavLink to={'/categories'} className={({ isActive }) => isActive ? 'text-white' : 'text-white/50'}> Categories</NavLink>
+                            </li>
+                        </ul>
+                    </nav>
+                )
+            }
+            {
+                // button log_in/log_out
+                isAuth
+                    ? (
+                        <button className='btn btn-red' onClick={logoutHandler}>
+                            <span>Log Out</span>
+                            <FaSignOutAlt />
+                        </button>
+                    )
+                    : (
+                        <Link to={'auth'} className='py-2 text-white/50 hover:text-white ml-auto'>
+                            Log In / Sing In
+                        </Link>
+                    )
+            }
+        </header>
+    )
 
-            </ul>
-          </nav>
-        )
-      }
-      {/*Actions*/}
-      {
-        isAuth ? (
-          <button className='btn btn-red' onClick={logOut}>
-            <span>Log Out</span>
-            <FaSignOutAlt/>
-          </button>
-        ) : (
-          <Link className='py-2 text-white/50 hover:text-white ml-auto' to={'auth'}>
-            Log In / Sign In
-          </Link>
-        )
-      }
-    </header>
-  );
-};
+}
 
 export default Header;
