@@ -1,85 +1,90 @@
-import { FC } from "react";
-import { toast } from "react-toastify";
-import { instance } from "../api/axios.api";
-import TransactionForm from "../components/TransactionForm";
-import TransactionTable from "../components/TransactionTable";
-import { ICategory} from "../types/types";
+import { FC } from "react"
+import TransactionForm from "../components/TransactionForm"
+import { instance } from "../api/axios.api"
+import { ICategory, IResponseTransactionLoader, ITransaction } from "../types/types"
+import { useLoaderData } from "react-router-dom"
+import { toast } from "react-toastify"
+import TransactionTabel from "../components/TransactionTabel"
+import { formatToUSD } from "../helper/currence.helper"
+import Chart from "../components/Chart"
 
-// загрузчик списка категорий => в форму
 export const transactionLoader = async () => {
-  const categories = await instance.get<ICategory[]>('/categories') // axios - запрос
-  
+  const categories = await instance.get<ICategory[]>('/categories')
+  const transactions = await instance.get<ITransaction[]>('/transaction')
+  const totalIncome = await instance.get<number>('/transaction/income/find')
+  const totalExpense = await instance.get<number>('/transaction/expense/find')
+
+
   const data = {
     categories: categories.data,
+    transactions: transactions.data,
+    totalIncome: totalIncome.data,
+    totalExpense: totalExpense.data,
   }
+
   return data
 }
 
-// action 
-export const transactionAction = async ({ request }: any) => {
-  switch (request.method) {
-    case 'POST': {
-      const formData = await request.formData() // данные с form-ы
-      // формируем объект из данных от формы
+export const transactionAction = async ({request} : any) => {
+  switch(request.method) {
+    case "POST": {
+      const formData = await request.formData()
       const newTransaction = {
         title: formData.get('title'),
-        amount: +formData.get('amount'), // '+' - иначе ошибка
+        amount: +formData.get('amount'),
         category: formData.get('category'),
-        type: formData.get('type'),
+        type: formData.get('type')
       }
 
-      // вызов axios (axios.api.ts) - передали объект с данными введенные в форме
-      await instance.post('/transactions', newTransaction)
-      toast.success('Transaction added.') //библиотека анимированных сообщений
-      return null // т.к. должно что-то вернуть
+      await instance.post('/transaction', newTransaction)
+      toast.success('Добавлена')
+      return null
     }
-      case 'DELETE': {
-
-      }
+    case "DELETE": {
+      const formData = await request.formData()
+      const transactionId = formData.get('id')
+      await instance.delete(`/transaction/transaction/${transactionId}`)
+      toast.success('Успешно')
+      return null
+    }
   }
 }
 
-
 const Transactions: FC = () => {
-
+  const {totalExpense, totalIncome} = useLoaderData() as IResponseTransactionLoader
   return (
-  <>
-    <div className="grid grid-cols-3 gap-4 mt-4 items-start">
-      {/* Add Transaction Form */}
-      <div className="col-span-2 grid">
-        <TransactionForm />
-      </div>
+    <>
+      <div className="grid grid-cols-3 gap-4 mt-4 items-start">
+        {/*Первый компонент */}
+        <div className="col-span-2 grid"><TransactionForm/></div>
+        {/*Второй компонент */}
+        <div className="rounded-md bg-slate-800 p-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <p className="uppercase text-md font-bold text-center">
+                Заработок
+              </p>
+              <p className="bg-green-600 p-1 rounded-sm text-center">
+                {formatToUSD.format(totalIncome)}
+              </p>
+            </div>
+            <div>
+              <p className="uppercase text-md font-bold text-center">
+                Затраты
+              </p>
+              <p className="bg-red-500 p-1 rounded-sm text-center">
+                {formatToUSD.format(totalExpense)}
+              </p>
+            </div>
+          </div>
 
-      {/* Statistic block */}
-      <div className="rounded-md bg-slate-800 p-3">
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <p className="uppercase text-sm font-bold text-center">
-              Total Income:
-            </p>
-            <p className="mt-2 rounded-sm bg-green-600 p-1 text-center">
-              1000$
-            </p>
-          </div>
-          <div>
-            <p className="uppercase text-sm font-bold text-center">
-              Total Expense:
-            </p>
-            <p className="mt-2 rounded-sm bg-red-500 p-1 text-center">
-              1000$
-            </p>
-          </div>
+          <Chart totalExpense={totalExpense} totalIncome={totalIncome}/>
         </div>
-
-        <>Chart</>
       </div>
-    </div>
+        {/*Третий компонент */}
+      <h1 className="my-5"><TransactionTabel limit={5}/></h1>
+    </>
+  )
+}
 
-    {/* Transactions Table */}
-    <h1 className="my-5">
-      <TransactionTable />
-    </h1>
-  </>);
-};
-
-export default Transactions;
+export default Transactions

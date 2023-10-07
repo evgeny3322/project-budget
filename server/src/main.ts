@@ -3,8 +3,8 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api'); // http://localhost:3001/api
-  app.enableCors(); // “CORS” (Cross-Origin Resource Sharing - совместное использование ресурсов между источниками)
+  app.setGlobalPrefix('api')
+  app.enableCors()
   await app.listen(3001);
 }
 bootstrap();

@@ -1,24 +1,19 @@
-// заполнение данными таблицу в БД
-import { User } from './../../user/entities/user.entity';
-import { Category } from './../../category/entities/category.entity';
-import { IsNotEmpty, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
-// ожидаемые входящие поля, для создания транзакции
+import { IsNotEmpty, IsNumber, IsString, MinLength } from "class-validator"
+import { Category } from "src/category/entities/category.entity"
+import { User } from "src/user/entities/user.entity"
+
 export class CreateTransactionDto {
-    @IsNotEmpty() // не пустой
-    title: string;
-    
+    @IsNotEmpty()
+    title: string
+
     @IsNotEmpty()
     @IsNumber()
-    amount: number; // количество валюты (доход/расход), например 1200 за март
+    amount: number
 
     @IsString()
-    @MinLength(6) // не меньше 6 символов
-    type: 'expense' | 'income'; // тип может быть либо расход, либо доход
-    
-    @IsNotEmpty()
-    category: Category;
+    @MinLength(6)
+    type: 'expense' | 'income'
 
-    @IsOptional() // так как поле не вводиться пользователем, а передается аргументом  @Req в server\src\transaction\transaction.controller.ts
-    //@IsNotEmpty()
-    user: User
+    @IsNotEmpty()
+    category: Category
 }
